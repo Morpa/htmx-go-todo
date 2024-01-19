@@ -15,24 +15,29 @@ func (m *SqliteDBRepo) Connection() *sql.DB {
 	return m.DB
 }
 
-func (m *SqliteDBRepo) FetchTasks() ([]models.Item, error) {
-	var items []models.Item
+func (m *SqliteDBRepo) FetchTasks() ([]*models.Item, error) {
 	query := `select id, title, completed from tasks order by position`
+
 	rows, err := m.DB.Query(query)
 	if err != nil {
-		return []models.Item{}, err
+		return nil, err
 	}
-
 	defer rows.Close()
 
+	var items []*models.Item
+
 	for rows.Next() {
-		item := models.Item{}
-		err := rows.Scan(&item.ID, &item.Title, &item.Completed)
+		var item models.Item
+		err := rows.Scan(
+			&item.ID,
+			&item.Title,
+			&item.Completed,
+		)
 		if err != nil {
-			return []models.Item{}, err
+			return nil, err
 		}
 
-		items = append(items, item)
+		items = append(items, &item)
 	}
 	return items, nil
 }
@@ -70,8 +75,9 @@ func (m *SqliteDBRepo) UpdateTask(ID int, title string) (models.Item, error) {
 }
 
 func (m *SqliteDBRepo) FetchCount() (int, error) {
-	var count int
 	query := `select count(*) from tasks`
+
+	var count int
 	row := m.DB.QueryRow(query)
 	err := row.Scan(&count)
 	if err != nil {

@@ -9,10 +9,10 @@ import (
 
 type DatabaseRepo interface {
 	Connection() *sql.DB
-	FetchTasks() ([]models.Item, error)
+	FetchCount() (int, error)
+	FetchTasks() ([]*models.Item, error)
 	FetchTask(ID int) (models.Item, error)
 	UpdateTask(ID int, title string) (models.Item, error)
-	FetchCount() (int, error)
 	InsertTask(title string) (models.Item, error)
 	DeleteTask(ctx context.Context, ID int) error
 	OrderTask(ctx context.Context, values []int) error

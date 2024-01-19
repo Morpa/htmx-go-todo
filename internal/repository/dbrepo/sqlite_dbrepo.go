@@ -16,11 +16,11 @@ func (m *SqliteDBRepo) Connection() *sql.DB {
 }
 
 func (m *SqliteDBRepo) FetchTasks() ([]*models.Item, error) {
-	query := `select id, title, completed from tasks order by position`
+	query := "select id, title, completed from tasks order by position"
 
 	rows, err := m.DB.Query(query)
 	if err != nil {
-		return nil, err
+		return []*models.Item{}, err
 	}
 	defer rows.Close()
 
@@ -34,7 +34,7 @@ func (m *SqliteDBRepo) FetchTasks() ([]*models.Item, error) {
 			&item.Completed,
 		)
 		if err != nil {
-			return nil, err
+			return []*models.Item{}, err
 		}
 
 		items = append(items, &item)
@@ -44,7 +44,7 @@ func (m *SqliteDBRepo) FetchTasks() ([]*models.Item, error) {
 
 func (m *SqliteDBRepo) FetchTask(ID int) (models.Item, error) {
 	var item models.Item
-	query := `select id, title, completed from tasks where id = (?)`
+	query := "select id, title, completed from tasks where id = (?)"
 	row := m.DB.QueryRow(query, ID)
 	err := row.Scan(
 		&item.ID,
@@ -75,7 +75,7 @@ func (m *SqliteDBRepo) UpdateTask(ID int, title string) (models.Item, error) {
 }
 
 func (m *SqliteDBRepo) FetchCount() (int, error) {
-	query := `select count(*) from tasks`
+	query := "select count(*) from tasks"
 
 	var count int
 	row := m.DB.QueryRow(query)
@@ -88,7 +88,7 @@ func (m *SqliteDBRepo) FetchCount() (int, error) {
 }
 
 func (m *SqliteDBRepo) FetchCompletedCount() (int, error) {
-	query := `select count(*) from tasks where completed = 1`
+	query := "select count(*) from tasks where completed = 1"
 
 	var count int
 	row := m.DB.QueryRow(query)
@@ -187,4 +187,16 @@ func (m *SqliteDBRepo) OrderTask(ctx context.Context, values []int) error {
 		return err
 	}
 	return nil
+}
+
+func (m *SqliteDBRepo) ToggleTask(ID int) (*models.Item, error) {
+	var item models.Item
+
+	query := "update tasks set completed = case when completed = 1 then 0 else 1 end where id = (?) returning id, title, completed"
+	row := m.DB.QueryRow(query, ID)
+	err := row.Scan(&item.ID, &item.Title, &item.Completed)
+	if err != nil {
+		return nil, err
+	}
+	return &item, nil
 }

@@ -11,14 +11,14 @@
     <body>
       <div class="max-w-screen-md mx-auto mt-8">
         <div class="flex justify-between items-center">
-          {{ template "TotalCount" dict "Count" .Count }}
-          {{ template "CompletedCount" dict "Count" .CompletedCount }}
+          {{ template "TotalCount" dict "Count" .Count "SwapOOB" false }}
+          {{ template "CompletedCount" dict "Count" .CompletedCount "SwapOOB" false }}
         </div>
 
           {{ template "Form" }}
 
         <div id="items" class="space-y-2.5 mt-4">
-          {{ range .Items }}{{ template "Item" }}{{ end }}
+          {{ range .Items }}{{ template "Item" dict "Item" . }}{{ end }}
         </div>   
       </div>
     </body>

@@ -15,8 +15,9 @@ func (app *application) routes() http.Handler {
 
 	mux.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 
-	mux.Get("/", app.HandleGetTasks)
-	mux.Post("/tasks", app.HandleCreateTask)
+	mux.Get("/", app.handleGetTasks)
+	mux.Post("/tasks", app.handleCreateTask)
+	mux.Put("/tasks/{id}/toggle", app.toggleTask)
 
 	return mux
 }

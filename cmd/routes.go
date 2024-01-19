@@ -15,10 +15,8 @@ func (app *application) routes() http.Handler {
 
 	mux.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 
-	// mux.Get("/", func(w http.ResponseWriter, _ *http.Request) {
-	// 	tmpl.ExecuteTemplate(w, "Base", nil)
-	// })
 	mux.Get("/", app.HandleGetTasks)
+	mux.Post("/tasks", app.HandleCreateTask)
 
 	return mux
 }

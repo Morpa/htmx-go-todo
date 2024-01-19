@@ -87,6 +87,19 @@ func (m *SqliteDBRepo) FetchCount() (int, error) {
 	return count, nil
 }
 
+func (m *SqliteDBRepo) FetchCompletedCount() (int, error) {
+	query := `select count(*) from tasks where completed = 1`
+
+	var count int
+	row := m.DB.QueryRow(query)
+	err := row.Scan(&count)
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
 func (m *SqliteDBRepo) InsertTask(title string) (models.Item, error) {
 	count, err := m.FetchCount()
 	if err != nil {

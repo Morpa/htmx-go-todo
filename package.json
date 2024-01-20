@@ -5,12 +5,11 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "concurrently \"vite build --watch\" \"tailwindcss -i ./src/index.css -o ./static/index.css --watch\""
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["Go", "HTMX", "TailwindCSS"],
+  "author": "Morpa",
+  "license": "MIT",
   "devDependencies": {
     "autoprefixer": "^10.4.17",
     "concurrently": "^8.2.2",

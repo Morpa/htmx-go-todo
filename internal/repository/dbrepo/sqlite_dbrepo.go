@@ -100,10 +100,10 @@ func (m *SqliteDBRepo) FetchCompletedCount() (int, error) {
 	return count, nil
 }
 
-func (m *SqliteDBRepo) InsertTask(title string) (models.Item, error) {
+func (m *SqliteDBRepo) InsertTask(title string) (*models.Item, error) {
 	count, err := m.FetchCount()
 	if err != nil {
-		return models.Item{}, err
+		return nil, err
 	}
 
 	var id int
@@ -111,7 +111,7 @@ func (m *SqliteDBRepo) InsertTask(title string) (models.Item, error) {
 	row := m.DB.QueryRow(query, title, count)
 	err = row.Scan(&id)
 	if err != nil {
-		return models.Item{}, err
+		return nil, err
 	}
 
 	item := models.Item{
@@ -120,7 +120,7 @@ func (m *SqliteDBRepo) InsertTask(title string) (models.Item, error) {
 		Completed: false,
 	}
 
-	return item, nil
+	return &item, nil
 }
 
 func (m *SqliteDBRepo) DeleteTask(ctx context.Context, ID int) error {

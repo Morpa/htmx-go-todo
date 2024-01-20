@@ -17,6 +17,7 @@ func (app *application) routes() http.Handler {
 
 	mux.Get("/", app.handleGetTasks)
 	mux.Post("/tasks", app.handleCreateTask)
+	mux.Put("/tasks", app.handleOrderTasks)
 	mux.Put("/tasks/{id}/toggle", app.toggleTask)
 	mux.Delete("/tasks/{id}", app.handleDeleteTask)
 	mux.Get("/tasks/{id}/edit", app.handleEditTask)

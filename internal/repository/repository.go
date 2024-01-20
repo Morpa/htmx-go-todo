@@ -16,7 +16,6 @@ type DatabaseRepo interface {
 	DeleteTask(ctx context.Context, ID int) error
 	FetchTask(ID int) (*models.Item, error)
 	UpdateTask(ID int, title string) (*models.Item, error)
-
-	InsertTask(title string) (models.Item, error)
 	OrderTask(ctx context.Context, values []int) error
+	InsertTask(title string) (*models.Item, error)
 }

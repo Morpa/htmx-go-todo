@@ -143,3 +143,31 @@ func (app *application) handleUpdateTask(w http.ResponseWriter, r *http.Request)
 	}
 	tmpl.ExecuteTemplate(w, "Item", map[string]any{"Item": task})
 }
+
+func (app *application) handleOrderTasks(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		log.Printf("error parsing form: %v", err)
+		return
+	}
+
+	var values []int
+	for k, v := range r.Form {
+		if k == "item" {
+			for _, v := range v {
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					log.Printf("error parsing id into int: %v", err)
+					return
+				}
+				values = append(values, value)
+			}
+		}
+	}
+
+	err = app.DB.OrderTask(r.Context(), values)
+	if err != nil {
+		log.Printf("error ordering tasks: %v", err)
+		return
+	}
+}

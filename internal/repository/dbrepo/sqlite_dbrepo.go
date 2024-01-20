@@ -42,7 +42,7 @@ func (m *SqliteDBRepo) FetchTasks() ([]*models.Item, error) {
 	return items, nil
 }
 
-func (m *SqliteDBRepo) FetchTask(ID int) (models.Item, error) {
+func (m *SqliteDBRepo) FetchTask(ID int) (*models.Item, error) {
 	var item models.Item
 	query := "select id, title, completed from tasks where id = (?)"
 	row := m.DB.QueryRow(query, ID)
@@ -52,15 +52,15 @@ func (m *SqliteDBRepo) FetchTask(ID int) (models.Item, error) {
 		&item.Completed,
 	)
 	if err != nil {
-		return models.Item{}, err
+		return nil, err
 	}
 
-	return item, nil
+	return &item, nil
 }
 
-func (m *SqliteDBRepo) UpdateTask(ID int, title string) (models.Item, error) {
+func (m *SqliteDBRepo) UpdateTask(ID int, title string) (*models.Item, error) {
 	var item models.Item
-	query := `update tasks set title = (?) where id = (?) returning id, title, completed`
+	query := "update tasks set title = (?) where id = (?) returning id, title, completed"
 	row := m.DB.QueryRow(query, title, ID)
 	err := row.Scan(
 		&item.ID,
@@ -68,10 +68,10 @@ func (m *SqliteDBRepo) UpdateTask(ID int, title string) (models.Item, error) {
 		&item.Completed,
 	)
 	if err != nil {
-		return models.Item{}, err
+		return nil, err
 	}
 
-	return item, nil
+	return &item, nil
 }
 
 func (m *SqliteDBRepo) FetchCount() (int, error) {
@@ -124,13 +124,13 @@ func (m *SqliteDBRepo) InsertTask(title string) (models.Item, error) {
 }
 
 func (m *SqliteDBRepo) DeleteTask(ctx context.Context, ID int) error {
-	query := `delete from tasks where id = (?)`
+	query := "delete from tasks where id = (?)"
 	_, err := m.DB.Exec(query, ID)
 	if err != nil {
 		return err
 	}
 
-	query = `select id from tasks order by position`
+	query = "select id from tasks order by position"
 	rows, err := m.DB.Query(query)
 	if err != nil {
 		return err
@@ -154,7 +154,7 @@ func (m *SqliteDBRepo) DeleteTask(ctx context.Context, ID int) error {
 	defer tx.Rollback()
 
 	for idx, id := range ids {
-		query := `update tasks set position = (?) where id = (?)`
+		query := "update tasks set position = (?) where id = (?)"
 		_, err := m.DB.Exec(query, idx, id)
 		if err != nil {
 			return err

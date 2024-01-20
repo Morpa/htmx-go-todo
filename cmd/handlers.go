@@ -81,3 +81,65 @@ func (app *application) toggleTask(w http.ResponseWriter, r *http.Request) {
 	}
 	tmpl.ExecuteTemplate(w, "CompletedCount", map[string]any{"Count": completedCount, "SwapOOB": true})
 }
+
+func (app *application) handleDeleteTask(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		log.Printf("error parsing id into int: %v", err)
+		return
+	}
+
+	err = app.DB.DeleteTask(r.Context(), id)
+	if err != nil {
+		log.Printf("error deleting the task: %v", err)
+		return
+	}
+
+	count, err := app.DB.FetchCount()
+	if err != nil {
+		log.Printf("error fetching count: %v", err)
+		return
+	}
+
+	completedCount, err := app.DB.FetchCompletedCount()
+	if err != nil {
+		log.Printf("error fetching completed count: %v", err)
+		return
+	}
+	tmpl.ExecuteTemplate(w, "TotalCount", map[string]any{"Count": count, "SwapOOB": true})
+	tmpl.ExecuteTemplate(w, "CompletedCount", map[string]any{"Count": completedCount, "SwapOOB": true})
+}
+
+func (app *application) handleEditTask(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		log.Printf("error parsing id into int: %v", err)
+		return
+	}
+
+	task, err := app.DB.FetchTask(id)
+	if err != nil {
+		log.Printf("error fetching task with id: %d %v", id, err)
+		return
+	}
+	tmpl.ExecuteTemplate(w, "Item", map[string]any{"Item": task, "Editing": true})
+}
+
+func (app *application) handleUpdateTask(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		log.Printf("error parsing id into int: %v", err)
+		return
+	}
+	title := r.FormValue("title")
+	if title == "" {
+		return
+	}
+
+	task, err := app.DB.UpdateTask(id, title)
+	if err != nil {
+		log.Printf("error fetching task with id: %d %v", id, err)
+		return
+	}
+	tmpl.ExecuteTemplate(w, "Item", map[string]any{"Item": task})
+}
